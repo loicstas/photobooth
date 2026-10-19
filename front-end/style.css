@@ -1,0 +1,740 @@
+/* ==========================================================================
+   PIXEL PHOTOBOOTH - PREMIUM RETRO ARCADE DESIGN SYSTEM
+   ========================================================================== */
+
+:root {
+  /* Color Palette */
+  --bg-deep: #120b17;
+  --bg-grid1: #1c1224;
+  --bg-grid2: #251830;
+  --panel-bg: #2f1f3d;
+  --panel-border: #4d3363;
+  --panel-hover: #3d2950;
+  
+  --ink: #0d0710;
+  --text-main: #fcf1f3;
+  --text-muted: #bda2be;
+  
+  /* Retro Neon Accents */
+  --neon-pink: #ff3b8d;
+  --neon-pink-glow: rgba(255, 59, 141, 0.4);
+  --neon-pink-dark: #b81b5c;
+  
+  --neon-yellow: #ffc436;
+  --neon-yellow-glow: rgba(255, 196, 54, 0.4);
+  --neon-yellow-dark: #b88612;
+  
+  --neon-green: #38e895;
+  --neon-green-glow: rgba(56, 232, 149, 0.4);
+  --neon-green-dark: #1b8f56;
+  
+  --neon-cyan: #3cd4ff;
+  --neon-cyan-glow: rgba(60, 212, 255, 0.4);
+  --neon-cyan-dark: #147da0;
+  
+  --danger-red: #ff4757;
+
+  /* Sizing and Pixel Grid */
+  --px: 4px;
+  --radius: 0px; /* Pixel-perfect crisp corners */
+  --shadow-block: 0 calc(-1 * var(--px)) 0 0 var(--ink),
+                  0 var(--px) 0 0 var(--ink),
+                  calc(-1 * var(--px)) 0 0 0 var(--ink),
+                  var(--px) 0 0 0 var(--ink);
+  --shadow-elevation: var(--shadow-block), 10px 10px 0 0 var(--ink);
+  --shadow-elevation-hover: var(--shadow-block), 14px 14px 0 0 var(--ink);
+}
+
+/* ==========================================================================
+   Base & Reset
+   ========================================================================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  image-rendering: pixelated;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  color: var(--text-main);
+  font-family: 'VT323', monospace;
+  font-size: 24px;
+  line-height: 1.25;
+  background-color: var(--bg-deep);
+  background-image: 
+    radial-gradient(circle at 50% 10%, rgba(255, 59, 141, 0.08) 0%, transparent 60%),
+    conic-gradient(var(--bg-grid1) 25%, var(--bg-grid2) 0 50%, var(--bg-grid1) 0 75%, var(--bg-grid2) 0);
+  background-size: 100% 100%, 20px 20px;
+  background-attachment: fixed;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Subtle CRT scanline overlay */
+body::after {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.08) 0px,
+    rgba(0, 0, 0, 0.08) 2px,
+    transparent 2px,
+    transparent 4px
+  );
+  z-index: 9999;
+  opacity: 0.7;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px 80px;
+}
+
+/* Typography */
+h1, h2, h3, .btn, .tag, .bar-title, .status-pill, .control-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-weight: 400;
+  letter-spacing: -0.5px;
+}
+
+/* ==========================================================================
+   Header Component
+   ========================================================================== */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 36px;
+  padding-bottom: 28px;
+  border-bottom: 4px dashed var(--panel-border);
+  position: relative;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.brand-cam {
+  flex-shrink: 0;
+  animation: float 3s ease-in-out infinite;
+  filter: drop-shadow(4px 4px 0 var(--ink));
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.title-group h1 {
+  font-size: clamp(22px, 5vw, 42px);
+  color: var(--neon-pink);
+  text-shadow: 4px 4px 0 var(--ink), 7px 7px 0 var(--neon-pink-dark);
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+
+.title-group p {
+  font-size: 26px;
+  color: var(--text-muted);
+}
+
+
+
+/* ==========================================================================
+   Interactive Controls & Action Bar
+   ========================================================================== */
+.action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 32px;
+  background: var(--panel-bg);
+  padding: 16px 20px;
+  box-shadow: var(--shadow-block), 6px 6px 0 0 var(--ink);
+}
+
+.search-filter-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  flex-grow: 1;
+}
+
+.search-box {
+  position: relative;
+  min-width: 260px;
+}
+
+.search-input {
+  width: 100%;
+  background: var(--bg-deep);
+  border: 0;
+  color: var(--text-main);
+  font-family: 'VT323', monospace;
+  font-size: 24px;
+  padding: 10px 14px;
+  box-shadow: var(--shadow-block);
+  outline: none;
+  transition: box-shadow 0.15s ease;
+}
+
+.search-input:focus {
+  outline: 3px solid var(--neon-yellow);
+  outline-offset: 2px;
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.filter-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  font-size: 10px;
+  padding: 10px 12px;
+  background: var(--bg-deep);
+  color: var(--text-muted);
+  border: 0;
+  cursor: pointer;
+  box-shadow: var(--shadow-block);
+  transition: all 0.1s ease;
+}
+
+.filter-btn:hover {
+  color: var(--text-main);
+  background: var(--panel-hover);
+}
+
+.filter-btn.active {
+  background: var(--neon-pink);
+  color: var(--ink);
+  box-shadow: inset 0 -3px 0 var(--neon-pink-dark), var(--shadow-block);
+}
+
+.bar-stats {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.count-display {
+  font-size: 26px;
+  color: var(--neon-yellow);
+}
+
+.count-display::after {
+  content: "_";
+  animation: blink 1s steps(2) infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* ==========================================================================
+   Buttons & Micro-interactions
+   ========================================================================== */
+.btn {
+  font-size: 11px;
+  padding: 12px 16px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 0;
+  position: relative;
+  background: var(--neon-green);
+  color: var(--ink);
+  box-shadow: inset 0 -4px 0 var(--neon-green-dark), var(--shadow-block);
+  transition: transform 0.08s ease, background 0.15s ease, box-shadow 0.08s ease;
+  user-select: none;
+}
+
+.btn:hover {
+  background: #6bf2ae;
+  transform: translateY(-2px);
+  box-shadow: inset 0 -4px 0 var(--neon-green-dark), var(--shadow-block), 0 4px 0 0 var(--ink);
+}
+
+.btn:active {
+  transform: translateY(2px);
+  box-shadow: inset 0 -2px 0 var(--neon-green-dark), var(--shadow-block);
+}
+
+.btn.pink {
+  background: var(--neon-pink);
+  color: var(--text-main);
+  box-shadow: inset 0 -4px 0 var(--neon-pink-dark), var(--shadow-block);
+}
+
+.btn.pink:hover {
+  background: #ff5ca0;
+}
+
+.btn.cyan {
+  background: var(--neon-cyan);
+  color: var(--ink);
+  box-shadow: inset 0 -4px 0 var(--neon-cyan-dark), var(--shadow-block);
+}
+
+.btn.cyan:hover {
+  background: #6fe1ff;
+}
+
+.btn.yellow {
+  background: var(--neon-yellow);
+  color: var(--ink);
+  box-shadow: inset 0 -4px 0 var(--neon-yellow-dark), var(--shadow-block);
+}
+
+.btn.yellow:hover {
+  background: #ffd366;
+}
+
+.btn.small {
+  font-size: 9px;
+  padding: 9px 12px;
+}
+
+.btn.icon-only {
+  padding: 10px;
+}
+
+.btn:focus-visible, .card:focus-visible, a:focus-visible {
+  outline: 4px dashed var(--neon-yellow);
+  outline-offset: 6px;
+}
+
+/* ==========================================================================
+   Card Grid & Session Cards
+   ========================================================================== */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 40px 32px;
+}
+
+.card {
+  background: var(--panel-bg);
+  border: 0;
+  color: inherit;
+  font: inherit;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-elevation);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  position: relative;
+}
+
+.card:hover {
+  transform: translate(-4px, -4px);
+  box-shadow: var(--shadow-elevation-hover);
+}
+
+.card:hover .bar-title {
+  background: var(--neon-yellow);
+  color: var(--ink);
+}
+
+.bar-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--neon-pink);
+  color: var(--text-main);
+  font-size: 10px;
+  padding: 10px 14px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.session-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.badge-new {
+  font-size: 8px;
+  background: var(--ink);
+  color: var(--neon-yellow);
+  padding: 3px 6px;
+  border-radius: 0;
+  animation: blink 1s steps(2) infinite;
+}
+
+.dots {
+  display: flex;
+  gap: 4px;
+}
+
+.dots i {
+  width: 6px;
+  height: 6px;
+  background: currentColor;
+  display: block;
+}
+
+.card-body {
+  padding: 14px;
+  cursor: pointer;
+  flex-grow: 1;
+}
+
+.main-preview-wrap {
+  position: relative;
+  overflow: hidden;
+  background: #1e1327;
+  outline: 4px solid var(--ink);
+  transition: outline 0.15s ease;
+}
+
+.card:hover .main-preview-wrap {
+  outline-color: var(--neon-cyan);
+}
+
+.main-img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  image-rendering: pixelated;
+  transition: transform 0.2s ease;
+}
+
+.card:hover .main-img {
+  transform: scale(1.02);
+}
+
+.card-thumbs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.thumb-item {
+  position: relative;
+  background: #1e1327;
+  outline: 3px solid var(--ink);
+  cursor: pointer;
+  transition: transform 0.15s ease, outline 0.15s ease;
+}
+
+.thumb-item img {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  image-rendering: pixelated;
+  display: block;
+}
+
+.thumb-item:hover {
+  transform: translateY(-3px) scale(1.03);
+  outline-color: var(--neon-yellow);
+  z-index: 2;
+}
+
+.thumb-number {
+  position: absolute;
+  bottom: 3px;
+  right: 3px;
+  background: rgba(13, 7, 16, 0.85);
+  color: var(--neon-cyan);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  padding: 2px 4px;
+}
+
+.card-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px 14px;
+  border-top: 2px dashed rgba(255, 255, 255, 0.08);
+}
+
+.tag {
+  font-size: 9px;
+  background: var(--panel-hover);
+  color: var(--neon-cyan);
+  padding: 6px 9px;
+  box-shadow: inset 0 0 0 1px var(--panel-border);
+}
+
+.tag.strip {
+  background: var(--neon-yellow);
+  color: var(--ink);
+}
+
+.card-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* ==========================================================================
+   Empty / Error / Skeleton States
+   ========================================================================== */
+.empty-box {
+  grid-column: 1 / -1;
+  background: var(--panel-bg);
+  padding: 60px 24px;
+  text-align: center;
+  box-shadow: var(--shadow-elevation);
+}
+
+.empty-box svg {
+  display: block;
+  margin: 0 auto 24px;
+}
+
+.empty-box h2 {
+  font-size: 18px;
+  color: var(--neon-pink);
+  margin-bottom: 12px;
+}
+
+.empty-box p {
+  font-size: 26px;
+  color: var(--text-muted);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.skeleton-card {
+  aspect-ratio: 4/3;
+  background: repeating-linear-gradient(
+    45deg,
+    var(--panel-bg),
+    var(--panel-bg) 16px,
+    var(--panel-hover) 16px,
+    var(--panel-hover) 32px
+  );
+  box-shadow: var(--shadow-block);
+  animation: shimmer 1.5s infinite linear;
+}
+
+@keyframes shimmer {
+  0% { opacity: 0.6; }
+  50% { opacity: 0.9; }
+  100% { opacity: 0.6; }
+}
+
+/* ==========================================================================
+   Modal Dialogs (Lightbox & QR Code)
+   ========================================================================== */
+dialog {
+  border: 0;
+  padding: 0;
+  background: var(--panel-bg);
+  color: var(--text-main);
+  max-width: min(1040px, 94vw);
+  width: 100%;
+  box-shadow: var(--shadow-block), 16px 16px 0 0 var(--ink);
+  margin: auto;
+}
+
+dialog::backdrop {
+  background: rgba(13, 7, 16, 0.92);
+  backdrop-filter: blur(4px);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--neon-pink);
+  color: var(--text-main);
+  padding: 12px 16px;
+  font-size: 11px;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.modal-viewer {
+  position: relative;
+  background: #0f0814;
+  outline: 4px solid var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 380px;
+  max-height: 65vh;
+  overflow: hidden;
+}
+
+.modal-viewer img {
+  max-width: 100%;
+  max-height: 65vh;
+  object-fit: contain;
+  image-rendering: pixelated;
+  display: block;
+}
+
+.modal-filmstrip {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+.modal-filmstrip-thumb {
+  flex: 0 0 110px;
+  aspect-ratio: 16/9;
+  outline: 3px solid var(--ink);
+  cursor: pointer;
+  position: relative;
+  background: #140b1a;
+  transition: all 0.1s ease;
+}
+
+.modal-filmstrip-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  image-rendering: pixelated;
+  display: block;
+}
+
+.modal-filmstrip-thumb.active {
+  outline: 4px solid var(--neon-yellow);
+  transform: translateY(-3px);
+}
+
+.modal-filmstrip-thumb:hover {
+  outline-color: var(--neon-cyan);
+}
+
+.modal-filmstrip-tag {
+  position: absolute;
+  bottom: 2px;
+  left: 2px;
+  background: rgba(0, 0, 0, 0.8);
+  color: var(--text-main);
+  font-size: 8px;
+  padding: 2px 4px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-nav {
+  display: flex;
+  gap: 10px;
+}
+
+.modal-buttons-right {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+
+/* ==========================================================================
+   Toast Notification System
+   ========================================================================== */
+#toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 10000;
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  padding: 14px 18px;
+  background: var(--panel-bg);
+  color: var(--text-main);
+  box-shadow: var(--shadow-block), 8px 8px 0 0 var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: slideIn 0.2s ease;
+  border-left: 6px solid var(--neon-cyan);
+}
+
+.toast.success { border-left-color: var(--neon-green); }
+.toast.info { border-left-color: var(--neon-cyan); }
+.toast.warning { border-left-color: var(--neon-yellow); }
+
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideOut {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(100%); opacity: 0; }
+}
+
+/* ==========================================================================
+   Responsive Adaptations
+   ========================================================================== */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .action-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .search-box {
+    width: 100%;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .modal-buttons-right {
+    justify-content: stretch;
+  }
+
+  .modal-buttons-right .btn {
+    flex: 1;
+  }
+}

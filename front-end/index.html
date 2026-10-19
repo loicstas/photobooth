@@ -1,278 +1,103 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pixel photobooth</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-<style>
-:root{
-  --ink:#1a121e; --bg1:#2b2030; --bg2:#33263a; --panel:#46354d; --rose:#d99a9f; --mauve:#7a5f6c;
-  --pink:#ff5fa2; --pinkd:#b8346f; --green:#8fd19e; --greend:#4f9a63; --blue:#7aa7d9; --sun:#f5a742; --text:#f6e6e8;
-  --px:4px;
-}
-*{box-sizing:border-box}
-html{image-rendering:pixelated}
-body{margin:0;color:var(--text);font-family:'VT323',monospace;font-size:24px;line-height:1.2;
-  background:conic-gradient(var(--bg1) 25%,var(--bg2) 0 50%,var(--bg1) 0 75%,var(--bg2) 0) 0 0/16px 16px}
-.wrap{max-width:1100px;margin:0 auto;padding:32px 20px 64px}
-h1,button,.btn,.tag,.bar-title{font-family:'Press Start 2P',monospace;font-weight:400}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Pixel Photobooth - Bekijk je fotosessies en download fotostrips direct naar je apparaat.">
+  <title>Pixel photobooth • Arcade Gallery</title>
 
-header{display:flex;gap:24px;align-items:center;flex-wrap:wrap;position:relative;margin:12px 0 44px}
-.cam{flex:none}
-h1{font-size:clamp(22px,6vw,48px);line-height:1.25;margin:0;color:var(--pink);
-  text-shadow:4px 4px 0 var(--ink),8px 8px 0 var(--pinkd)}
-header p{margin:14px 0 0;font-size:28px;color:var(--rose)}
-.spark{position:absolute}
-.s1{left:150px;top:-12px}.s2{right:8%;top:8px}.s3{right:22%;bottom:-18px}
+  <!-- Google Web Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 
-.bar{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:28px}
-.count{font-size:30px;color:var(--sun)}
-.count::after{content:"_";animation:cursor 1s steps(2) infinite}
-button,.btn{background:var(--green);color:var(--ink);border:0;padding:12px 14px;font-size:12px;cursor:pointer;text-decoration:none;display:inline-block;
-  position:relative;box-shadow:inset 0 -4px 0 var(--greend),0 calc(-1*var(--px)) 0 0 var(--ink),0 var(--px) 0 0 var(--ink),calc(-1*var(--px)) 0 0 0 var(--ink),var(--px) 0 0 0 var(--ink)}
-button:hover,.btn:hover{background:#a8e6b5}
-button:active,.btn:active{top:4px;box-shadow:0 calc(-1*var(--px)) 0 0 var(--ink),0 var(--px) 0 0 var(--ink),calc(-1*var(--px)) 0 0 0 var(--ink),var(--px) 0 0 0 var(--ink)}
-.btn.pink{background:var(--pink);box-shadow:inset 0 -4px 0 var(--pinkd),0 calc(-1*var(--px)) 0 0 var(--ink),0 var(--px) 0 0 var(--ink),calc(-1*var(--px)) 0 0 0 var(--ink),var(--px) 0 0 0 var(--ink)}
-button:focus-visible,.card:focus-visible,a:focus-visible{outline:4px dashed var(--sun);outline-offset:8px}
-
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:40px 32px}
-.card{background:var(--panel);padding:0;cursor:pointer;text-align:left;color:inherit;border:0;font:inherit;display:block;width:100%;
-  box-shadow:0 calc(-1*var(--px)) 0 0 var(--ink),0 var(--px) 0 0 var(--ink),calc(-1*var(--px)) 0 0 0 var(--ink),var(--px) 0 0 0 var(--ink),12px 12px 0 0 var(--ink)}
-.card:hover .bar-title{background:var(--sun)}
-.card:hover{transform:translate(-4px,-4px);box-shadow:0 calc(-1*var(--px)) 0 0 var(--ink),0 var(--px) 0 0 var(--ink),calc(-1*var(--px)) 0 0 0 var(--ink),var(--px) 0 0 0 var(--ink),16px 16px 0 0 var(--ink)}
-.bar-title{display:flex;justify-content:space-between;align-items:center;background:var(--pink);color:var(--ink);font-size:10px;padding:10px 12px}
-.dots{display:flex;gap:4px}.dots i{width:8px;height:8px;background:var(--ink);display:block}
-.body{padding:12px}
-.main{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;background:var(--mauve);image-rendering:pixelated;outline:4px solid var(--ink);cursor:pointer;transition:outline .15s ease}
-.main:hover{outline:4px solid var(--sun)}
-.thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
-.thumbs img{width:100%;aspect-ratio:16/9;object-fit:cover;image-rendering:pixelated;outline:3px solid var(--ink);cursor:pointer;transition:transform .15s ease,outline .15s ease}
-.thumbs img:hover{transform:scale(1.05);outline:3px solid var(--sun)}
-.tag{font-size:10px;background:var(--blue);color:var(--ink);padding:6px 8px}
-.tag.strip{background:var(--sun)}
-.msg{padding:40px 20px;background:var(--panel);text-align:center;font-size:28px;grid-column:1/-1}
-.msg svg{display:block;margin:0 auto 20px}
-.msg.error{background:#5a2a3a}
-
-dialog{border:0;padding:0;background:var(--panel);color:var(--text);max-width:min(1000px,94vw);width:100%;
-  box-shadow:0 calc(-1*var(--px)) 0 0 var(--ink),0 var(--px) 0 0 var(--ink),calc(-1*var(--px)) 0 0 0 var(--ink),var(--px) 0 0 0 var(--ink),14px 14px 0 0 var(--ink)}
-dialog::backdrop{background:rgba(26,18,30,.88)}
-dialog .body{padding:16px}
-dialog img{width:100%;display:block;image-rendering:pixelated;outline:4px solid var(--ink)}
-.actions{display:flex;gap:16px;flex-wrap:wrap;margin-top:24px;justify-content:space-between;align-items:center}
-.nav{display:flex;gap:16px}
-
-.open{background:none;box-shadow:none;padding:0;display:block;width:100%;text-align:left;color:inherit;font-family:'VT323',monospace;font-size:24px;position:static;cursor:pointer}
-.open:hover{background:none}.open:active{top:0;box-shadow:none}
-.foot{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:4px 12px 14px}
-.btn.small{font-size:10px;padding:10px}
-.new{font-weight:400;background:var(--ink);color:var(--sun);padding:3px 5px;margin-left:6px;animation:cursor 1s steps(2) infinite}
-.skel{aspect-ratio:4/3;background:conic-gradient(var(--panel) 25%,#4f3d57 0 50%,var(--panel) 0 75%,#4f3d57 0) 0 0/16px 16px;
-  box-shadow:0 -4px 0 0 var(--ink),0 4px 0 0 var(--ink),-4px 0 0 0 var(--ink),4px 0 0 0 var(--ink)}
-@keyframes cursor{50%{opacity:0}}
-@keyframes twinkle{50%{opacity:0}}
-@media (prefers-reduced-motion:no-preference){
-  .spark{animation:twinkle 1.2s steps(1) infinite}
-  .s2{animation-delay:.4s}.s3{animation-delay:.8s}
-}
-@media (prefers-reduced-motion:reduce){.count::after,.new{animation:none}}
-</style>
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div class="cam" id="cam"></div>
-    <div>
-      <h1>Pixel photobooth</h1>
-      <p>Drie foto's, een strip. Kies een sessie en download je favoriet.</p>
-    </div>
-    <span class="spark s1"></span><span class="spark s2"></span><span class="spark s3"></span>
-  </header>
 
-  <div class="bar">
-    <span class="count" id="count">Laden</span>
-    <button id="refresh" type="button">Vernieuwen</button>
-  </div>
-
-  <main id="grid" class="grid" aria-live="polite"></main>
-</div>
-
-<dialog id="box" aria-label="Foto bekijken">
-  <div class="bar-title"><span id="boxtitle">Foto</span><span class="dots"><i></i><i></i><i></i></span></div>
-  <div class="body">
-    <img id="big" alt="">
-    <div class="actions">
-      <div class="nav">
-        <button id="prev" type="button" aria-label="Vorige">&lt;</button>
-        <button id="next" type="button" aria-label="Volgende">&gt;</button>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-brand">
+        <div class="brand-cam" id="brand-cam" aria-hidden="true"></div>
+        <div class="title-group">
+          <h1>Pixel photobooth</h1>
+          <p>Drie foto's, een strip. Kies een sessie en download je favoriet.</p>
+        </div>
       </div>
-      <a id="dl" class="btn pink" download>Download</a>
-      <button id="close" type="button">Sluiten</button>
-    </div>
+    </header>
+
+    <!-- Interactive Action Bar (Search & Filter) -->
+    <nav class="action-bar" aria-label="Filters en acties">
+      <div class="search-filter-group">
+        <div class="search-box">
+          <input 
+            type="search" 
+            id="search-input" 
+            class="search-input" 
+            placeholder="🔍 Zoek sessie of datum..." 
+            aria-label="Zoek naar sessie of datum"
+          >
+        </div>
+
+        <div class="filter-pills" role="radiogroup" aria-label="Filter foto's">
+          <button class="filter-btn active" type="button" data-filter="all">Alles</button>
+          <button class="filter-btn" type="button" data-filter="strips">★ Strips</button>
+          <button class="filter-btn" type="button" data-filter="singles">Losse Foto's</button>
+        </div>
+      </div>
+
+      <div class="bar-stats">
+        <span class="count-display" id="count">Laden...</span>
+        <button class="btn yellow small" id="refresh-btn" type="button">
+          🔄 Vernieuwen
+        </button>
+      </div>
+    </nav>
+
+    <!-- Photos Grid -->
+    <main id="grid" class="grid" aria-live="polite">
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+    </main>
   </div>
-</dialog>
 
-<script>
-// Pixel-sprites: elke letter is een pixel, getekend als vierkantje.
-function sprite(rows, pal, px) {
-  let r = '';
-  rows.forEach((row, y) => [...row].forEach((c, x) => {
-    if (pal[c]) r += `<rect x="${x}" y="${y}" width="1" height="1" fill="${pal[c]}"/>`;
-  }));
-  return `<svg viewBox="0 0 ${rows[0].length} ${rows.length}" width="${rows[0].length * px}" height="${rows.length * px}" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;
-}
-const CAM = [
-  "......KKKK......",
-  ".KKKKKBBBBKKKKK.",
-  "KBBBBBBBBBBBBPPK",
-  "KBBBKKKKKKBBBBBK",
-  "KBBKLLLLLLKBBBBK",
-  "KBBKLGGGGLKBBBBK",
-  "KBBKLGWGGLKBBBBK",
-  "KBBKLGGGGLKBBBBK",
-  "KBBKLLLLLLKBBBBK",
-  "KBBBKKKKKKBBBBBK",
-  "KDDDDDDDDDDDDDDK",
-  ".KKKKKKKKKKKKKK."
-];
-const STAR = ["..Y..", "..Y..", "YYYYY", "..Y..", "..Y.."];
-const CPAL = {K:'#1a121e', B:'#d99a9f', D:'#7a5f6c', L:'#f6e6e8', G:'#7aa7d9', W:'#ffffff', P:'#ff5fa2'};
-const camHTML = px => sprite(CAM, CPAL, px);
-document.getElementById('cam').innerHTML = camHTML(8);
-document.querySelectorAll('.spark').forEach(s => s.innerHTML = sprite(STAR, {Y:'#f5a742'}, 4));
+  <!-- Lightbox Gallery Dialog -->
+  <dialog id="lightbox" aria-labelledby="lightbox-title">
+    <div class="modal-header">
+      <span id="lightbox-title">Foto preview</span>
+      <span class="dots"><i></i><i></i><i></i></span>
+    </div>
+    <div class="modal-body">
+      <div class="modal-viewer">
+        <img id="lightbox-img" src="" alt="Geselecteerde foto">
+      </div>
 
-// Bepaal de back-end API URL
-// Als de pagina draait op poort 3000 (direct geserveerd door back-end), is API leeg.
-// Als de pagina via Live Server of een andere poort draait, verbind met :3000 op dezelfde host.
-const isPort3000 = location.port === '3000';
-const API = isPort3000
-  ? ''
-  : (location.protocol.startsWith('http') ? `${location.protocol}//${location.hostname}:3000` : 'http://localhost:3000');
+      <!-- Filmstrip thumbnails of this session -->
+      <div class="modal-filmstrip" id="lightbox-filmstrip" aria-label="Sessie miniaturen"></div>
 
-const grid = document.getElementById('grid');
-const box = document.getElementById('box');
-const big = document.getElementById('big');
-const dl = document.getElementById('dl');
-let groep = [], idx = 0;
+      <!-- Lightbox Controls -->
+      <div class="modal-actions">
+        <div class="modal-nav">
+          <button class="btn" id="prev-btn" type="button" aria-label="Vorige foto">&lt; Vorige</button>
+          <button class="btn" id="next-btn" type="button" aria-label="Volgende foto">Volgende &gt;</button>
+        </div>
+        
+        <div class="modal-buttons-right">
+          <button class="btn yellow" id="copy-link-btn" type="button">🔗 Link Kopiëren</button>
+          <a class="btn pink" id="download-btn" download>💾 Download</a>
+          <button class="btn" id="close-btn" type="button">Sluiten</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
 
-const src = f => (f.url && f.url.startsWith('http') ? f.url : API + f.url);
-const downloadUrl = f => `${API}/api/download/${encodeURIComponent(f.bestand)}`;
-const datum = d => new Date(d).toLocaleString('nl-BE', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+  <!-- Floating Toast Notifications -->
+  <div id="toast-container" aria-live="polite"></div>
 
-let isLaden = false;
-async function laad() {
-  if (isLaden) return;
-  isLaden = true;
-  try {
-    const res = await fetch(API + '/api/photos');
-    if (!res.ok) throw new Error('Status ' + res.status);
-    const fotos = await res.json();
-    teken(fotos);
-  } catch (e) {
-    console.error('Fout bij ophalen foto\'s:', e);
-    document.getElementById('count').textContent = 'Geen verbinding';
-    grid.innerHTML = '<div class="msg error"><p>Kan de foto\'s niet laden.</p><p style="font-size:20px;margin-top:12px;opacity:0.85">Controleer of de server draait op localhost:3000 en klik op Vernieuwen.</p></div>';
-  } finally {
-    isLaden = false;
-  }
-}
-
-function teken(fotos) {
-  const sessies = new Map();
-  fotos.forEach(f => {
-    const k = f.sessie || 'onbekend';
-    if (!sessies.has(k)) sessies.set(k, []);
-    sessies.get(k).push(f);
-  });
-  document.getElementById('count').textContent = sessies.size + (sessies.size === 1 ? ' sessie' : ' sessies');
-  if (!sessies.size) {
-    grid.innerHTML = '<div class="msg">' + camHTML(8) + 'Nog geen foto\'s. Maak er een in de booth!</div>';
-    return;
-  }
-  grid.innerHTML = '';
-  let nieuwste = true;
-  sessies.forEach(g => {
-    g.sort((a, b) => a.nummer - b.nummer); // strip (0) eerst, dan 1, 2, 3
-    const strip = g.find(f => f.nummer === 0);
-    const losse = g.filter(f => f.nummer !== 0);
-    const hoofd = strip || losse[0];
-    const d = datum(hoofd.aangemaakt);
-
-    const kaart = document.createElement('div');
-    kaart.className = 'card';
-    kaart.innerHTML =
-      `<div class="open" role="button" tabindex="0" aria-label="Open sessie van ${d}">` +
-        `<div class="bar-title"><span>${d}${nieuwste ? '<b class="new">Nieuw</b>' : ''}</span><span class="dots"><i></i><i></i><i></i></span></div>` +
-        `<div class="body"><img class="main" src="${src(hoofd)}" alt="Fotostrip van ${d}" loading="lazy">` +
-        `<div class="thumbs">${losse.slice(0, 3).map(f => `<img src="${src(f)}" alt="Foto ${f.nummer}" loading="lazy" data-nummer="${f.nummer}">`).join('')}</div></div>` +
-      `</div>` +
-      `<div class="foot"><span class="tag ${strip ? 'strip' : ''}">${strip ? 'Strip' : losse.length + ' foto\'s'}</span>` +
-      `<a class="btn pink small dl-btn" href="${downloadUrl(hoofd)}" download="${hoofd.bestand}">${strip ? 'Download strip' : 'Download'}</a></div>`;
-
-    // Klikken op hele sessie opent hoofdfoto
-    const openBtn = kaart.querySelector('.open');
-    openBtn.addEventListener('click', (e) => {
-      if (e.target.closest('.thumbs img')) return; // aparte thumbnail klik handelt dit af
-      open(g, 0);
-    });
-    openBtn.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        open(g, 0);
-      }
-    });
-
-    // Klikken op specifieke thumbnail opent direct die foto
-    kaart.querySelectorAll('.thumbs img').forEach(img => {
-      img.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const nr = Number(img.dataset.nummer);
-        const pos = g.findIndex(f => f.nummer === nr);
-        open(g, pos !== -1 ? pos : 0);
-      });
-    });
-
-    grid.appendChild(kaart);
-    nieuwste = false;
-  });
-}
-
-function open(lijst, i) {
-  if (lijst) groep = lijst;
-  idx = (i + groep.length) % groep.length;
-  const f = groep[idx];
-  const naam = f.nummer === 0 ? 'Fotostrip' : 'Foto ' + f.nummer;
-  big.src = src(f);
-  big.alt = naam;
-  document.getElementById('boxtitle').textContent = naam + '  ' + (idx + 1) + '/' + groep.length;
-  dl.href = downloadUrl(f);
-  dl.setAttribute('download', f.bestand);
-  new Image().src = src(groep[(idx + 1) % groep.length]); // volgende alvast preloaden
-  if (!box.open) box.showModal();
-}
-
-document.getElementById('prev').onclick = () => open(null, idx - 1);
-document.getElementById('next').onclick = () => open(null, idx + 1);
-document.addEventListener('keydown', e => {
-  if (!box.open) return;
-  if (e.key === 'ArrowLeft') open(null, idx - 1);
-  if (e.key === 'ArrowRight') open(null, idx + 1);
-});
-let startX = 0;
-box.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, {passive: true});
-box.addEventListener('touchend', e => {
-  const d = e.changedTouches[0].clientX - startX;
-  if (Math.abs(d) > 50) open(null, idx + (d < 0 ? 1 : -1));
-});
-document.getElementById('close').onclick = () => box.close();
-box.addEventListener('click', e => { if (e.target === box) box.close(); });
-document.getElementById('refresh').onclick = laad;
-
-grid.innerHTML = '<div class="skel"></div>'.repeat(3);
-laad();
-setInterval(() => { if (!box.open) laad(); }, 10000);
-</script>
+  <!-- Application Script -->
+  <script src="app.js"></script>
 </body>
 </html>
