@@ -92,10 +92,10 @@ function cleanOldLocalBackup(sessie, nummer, currentBestand) {
         try {
           const meta = JSON.parse(fs.readFileSync(path.join(backupMap, file), "utf8"));
           if (meta.sessie === sessie && meta.nummer === nummer && meta.bestand !== currentBestand) {
-            try { fs.unlinkSync(path.join(backupMap, file)); } catch {}
-            try { fs.unlinkSync(path.join(backupMap, meta.bestand)); } catch {}
+            try { fs.unlinkSync(path.join(backupMap, file)); } catch { }
+            try { fs.unlinkSync(path.join(backupMap, meta.bestand)); } catch { }
           }
-        } catch {}
+        } catch { }
       }
     }
   } catch (err) {
@@ -115,7 +115,7 @@ function getLocalPhotos(limit = 300) {
           if (fs.existsSync(path.join(backupMap, meta.bestand))) {
             photos.push(meta);
           }
-        } catch {}
+        } catch { }
       }
     }
     photos.sort((a, b) => new Date(b.aangemaakt).getTime() - new Date(a.aangemaakt).getTime());
@@ -136,11 +136,11 @@ function deleteLocalSession(sessie) {
         try {
           const meta = JSON.parse(fs.readFileSync(path.join(backupMap, file), "utf8"));
           if (meta.sessie === sessie) {
-            try { fs.unlinkSync(path.join(backupMap, file)); } catch {}
-            try { fs.unlinkSync(path.join(backupMap, meta.bestand)); } catch {}
+            try { fs.unlinkSync(path.join(backupMap, file)); } catch { }
+            try { fs.unlinkSync(path.join(backupMap, meta.bestand)); } catch { }
             deleted++;
           }
-        } catch {}
+        } catch { }
       }
     }
   } catch (err) {
