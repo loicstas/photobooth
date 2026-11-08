@@ -44,6 +44,8 @@ const SPRITES = {
   }
 };
 
+const PIXEL_ROTATE_SVG = `<svg class="pixel-icon" viewBox="0 0 10 8" width="13" height="10" shape-rendering="crispEdges" aria-hidden="true" fill="currentColor"><rect x="2" y="0" width="4" height="1"/><rect x="1" y="1" width="1" height="1"/><rect x="6" y="1" width="1" height="1"/><rect x="0" y="2" width="1" height="1"/><rect x="7" y="2" width="1" height="1"/><rect x="0" y="3" width="1" height="1"/><rect x="5" y="3" width="5" height="1"/><rect x="0" y="4" width="1" height="1"/><rect x="6" y="4" width="3" height="1"/><rect x="0" y="5" width="1" height="1"/><rect x="7" y="5" width="1" height="1"/><rect x="1" y="6" width="1" height="1"/><rect x="2" y="7" width="5" height="1"/></svg>`;
+
 // ==========================================================================
 // 2. API & Application State
 // ==========================================================================
@@ -79,6 +81,7 @@ const elements = {
   lightboxFilmstrip: document.getElementById('lightbox-filmstrip'),
   prevBtn: document.getElementById('prev-btn'),
   nextBtn: document.getElementById('next-btn'),
+  rotateBtn: document.getElementById('rotate-btn'),
   downloadBtn: document.getElementById('download-btn'),
   copyLinkBtn: document.getElementById('copy-link-btn'),
   closeBtn: document.getElementById('close-btn'),
@@ -117,6 +120,157 @@ function showToast(text, type = 'info', duration = 3000) {
     toast.style.animation = 'slideOut 0.2s ease forwards';
     setTimeout(() => toast.remove(), 200);
   }, duration);
+}
+
+// ==========================================================================
+// Rotation & Download Management
+// ==========================================================================
+function getRotation(bestand) {
+  try {
+    const map = JSON.parse(localStorage.getItem('photobooth_rotations') || '{}');
+    return map[bestand] || 0;
+  } catch {
+    return 0;
+  }
+}
+
+function setRotation(bestand, deg) {
+  try {
+    const map = JSON.parse(localStorage.getItem('photobooth_rotations') || '{}');
+    const normalized = (deg % 360 + 360) % 360;
+    if (normalized === 0) {
+      delete map[bestand];
+    } else {
+      map[bestand] = normalized;
+    }
+    localStorage.setItem('photobooth_rotations', JSON.stringify(map));
+  } catch { }
+}
+
+function rotatePhoto(bestand) {
+  const current = getRotation(bestand);
+  const next = (current + 90) % 360;
+  setRotation(bestand, next);
+  return next;
+}
+
+function getCardRotationTransform(deg, naturalWidth = 1280, naturalHeight = 720) {
+  const normalized = (deg % 360 + 360) % 360;
+  if (normalized === 0) return '';
+  if (normalized === 180) return 'rotate(180deg)';
+  const scale = naturalHeight && naturalWidth ? naturalHeight / naturalWidth : 0.5625;
+  return `rotate(${normalized}deg) scale(${scale})`;
+}
+
+function applyLightboxRotation(deg) {
+  if (!elements.lightboxImg) return;
+  const normalized = (deg % 360 + 360) % 360;
+  if (normalized === 0) {
+    elements.lightboxImg.style.transform = '';
+  } else if (normalized === 180) {
+    elements.lightboxImg.style.transform = 'rotate(180deg)';
+  } else {
+    const scale = elements.lightboxImg.naturalHeight && elements.lightboxImg.naturalWidth
+      ? elements.lightboxImg.naturalHeight / elements.lightboxImg.naturalWidth
+      : 0.5625;
+    elements.lightboxImg.style.transform = `rotate(${normalized}deg) scale(${scale})`;
+  }
+}
+
+function downloadPhoto(photo, rotation = 0) {
+  const rot = (rotation % 360 + 360) % 360;
+  if (rot === 0) {
+    const a = document.createElement('a');
+    a.href = getDownloadUrl(photo);
+    a.download = photo.bestand;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    return;
+  }
+
+  showToast('💾 Bezig met draaien en downloaden...', 'info', 2000);
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.src = getImgSrc(photo);
+  img.onload = () => {
+    try {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const rad = rot * Math.PI / 180;
+      const isSideways = rot % 180 !== 0;
+
+      canvas.width = isSideways ? img.naturalHeight : img.naturalWidth;
+      canvas.height = isSideways ? img.naturalWidth : img.naturalHeight;
+
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.rotate(rad);
+      ctx.drawImage(img, -img.naturalWidth / 2, -img.naturalHeight / 2);
+
+      canvas.toBlob((blob) => {
+        if (!blob) throw new Error('Blob conversie mislukt');
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `gedraaid-${photo.bestand}`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 2000);
+        showToast('✅ Gedraaide foto gedownload!', 'success');
+      }, 'image/png');
+    } catch (err) {
+      console.warn('Canvas download fallback naar origineel:', err);
+      const a = document.createElement('a');
+      a.href = getDownloadUrl(photo);
+      a.download = photo.bestand;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+  };
+  img.onerror = () => {
+    const a = document.createElement('a');
+    a.href = getDownloadUrl(photo);
+    a.download = photo.bestand;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  };
+}
+
+async function deleteSession(sessieId) {
+  if (!confirm(`Weet je zeker dat je fotosessie "${sessieId}" wilt verwijderen? Dit kan niet ongedaan worden gemaakt.`)) {
+    return false;
+  }
+
+  try {
+    const res = await fetch(`${API}/api/sessions/${encodeURIComponent(sessieId)}`, {
+      method: 'DELETE',
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.fout || `HTTP ${res.status}`);
+    }
+
+    showToast('🗑️ Fotosessie succesvol verwijderd!', 'success');
+
+    // Close lightbox if currently open on this session
+    if (elements.lightbox.open && state.currentGroup && state.currentGroup[0]?.sessie === sessieId) {
+      elements.lightbox.close();
+    }
+
+    // Remove from state and refresh grid
+    state.sessions.delete(sessieId);
+    state.rawPhotos = state.rawPhotos.filter((p) => p.sessie !== sessieId);
+    renderGrid();
+    return true;
+  } catch (err) {
+    console.error('Fout bij verwijderen sessie:', err);
+    showToast(`❌ Fout bij verwijderen: ${err.message}`, 'error');
+    return false;
+  }
 }
 
 // ==========================================================================
@@ -187,7 +341,7 @@ function renderGrid() {
   state.sessions.forEach((photos, sessieId) => {
     const strip = photos.find((p) => p.nummer === 0);
     const singles = photos.filter((p) => p.nummer !== 0);
-    const headPhoto = strip || singles[0] || photos[0];
+    const headPhoto = singles[0] || strip || photos[0];
     const dateFormatted = formatDate(headPhoto ? headPhoto.aangemaakt : null);
 
     // Apply filter
@@ -227,7 +381,11 @@ function renderGrid() {
     card.className = 'card';
     card.setAttribute('aria-label', `Sessie van ${s.dateFormatted}`);
 
-    const thumbsHtml = s.singles.slice(0, 3).map((f) => `
+    s.currentPreviewPhoto = s.headPhoto;
+    const initRot = getRotation(s.headPhoto.bestand);
+    const initTransform = getCardRotationTransform(initRot);
+
+    const thumbsHtml = (s.singles.length > 0 ? s.singles.slice(0, 3) : s.photos.slice(0, 3)).map((f) => `
       <div class="thumb-item" data-nummer="${f.nummer}" title="Bekijk foto ${f.nummer}">
         <img src="${getImgSrc(f)}" alt="Foto ${f.nummer}" loading="lazy">
         <span class="thumb-number">${f.nummer}</span>
@@ -244,25 +402,72 @@ function renderGrid() {
       </div>
       <div class="card-body">
         <div class="main-preview-wrap" title="Klik om sessie te bekijken">
-          <img class="main-img" src="${getImgSrc(s.headPhoto)}" alt="Hoofdfoto sessie" loading="lazy">
+          <img class="main-img" src="${getImgSrc(s.headPhoto)}" alt="Foto 1 sessie" loading="lazy"${initTransform ? ` style="transform: ${initTransform};"` : ''}>
         </div>
         ${thumbsHtml ? `<div class="card-thumbs">${thumbsHtml}</div>` : ''}
       </div>
       <div class="card-foot">
-        <span class="tag ${s.strip ? 'strip' : ''}">${s.strip ? '★ Fotostrip' : s.singles.length + ' foto\'s'}</span>
+        <span class="tag">${s.singles.length} foto's</span>
         <div class="card-actions">
-          <a class="btn pink small dl-btn" href="${getDownloadUrl(s.headPhoto)}" download="${s.headPhoto.bestand}" title="Download hoofdfoto">💾 Download</a>
+          <button class="btn cyan small rotate-card-btn" type="button" title="Draai foto 90°">${PIXEL_ROTATE_SVG}</button>
+          <button class="btn pink small dl-btn" type="button" title="Download foto">💾 Download</button>
         </div>
       </div>
     `;
 
     // Click listeners
     const mainWrap = card.querySelector('.main-preview-wrap');
-    mainWrap.addEventListener('click', () => {
-      openLightbox(s.photos, 0);
-    });
+    if (mainWrap) {
+      mainWrap.addEventListener('click', () => {
+        const firstIdx = s.photos.findIndex((p) => p.nummer !== 0);
+        openLightbox(s.photos, firstIdx !== -1 ? firstIdx : 0);
+      });
+    }
+
+    const mainImg = card.querySelector('.main-img');
+    const rotateCardBtn = card.querySelector('.rotate-card-btn');
+    const dlBtn = card.querySelector('.dl-btn');
+
+    if (rotateCardBtn) {
+      rotateCardBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const activePhoto = s.currentPreviewPhoto || s.headPhoto;
+        const newRot = rotatePhoto(activePhoto.bestand);
+        if (mainImg) {
+          mainImg.style.transform = getCardRotationTransform(newRot, mainImg.naturalWidth, mainImg.naturalHeight);
+        }
+        showToast(`🔄 Foto 90° gedraaid (${newRot}°)`, 'info', 1500);
+      });
+    }
+
+    if (dlBtn) {
+      dlBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const activePhoto = s.currentPreviewPhoto || s.headPhoto;
+        const rot = getRotation(activePhoto.bestand);
+        downloadPhoto(activePhoto, rot);
+      });
+    }
 
     card.querySelectorAll('.thumb-item').forEach((thumb) => {
+      thumb.addEventListener('mouseenter', () => {
+        const nr = Number(thumb.dataset.nummer);
+        const photo = s.photos.find((p) => p.nummer === nr);
+        if (photo && mainImg) {
+          s.currentPreviewPhoto = photo;
+          mainImg.src = getImgSrc(photo);
+          const rot = getRotation(photo.bestand);
+          mainImg.style.transform = getCardRotationTransform(rot, mainImg.naturalWidth, mainImg.naturalHeight);
+        }
+      });
+      thumb.addEventListener('mouseleave', () => {
+        s.currentPreviewPhoto = s.headPhoto;
+        if (mainImg) {
+          mainImg.src = getImgSrc(s.headPhoto);
+          const rot = getRotation(s.headPhoto.bestand);
+          mainImg.style.transform = getCardRotationTransform(rot, mainImg.naturalWidth, mainImg.naturalHeight);
+        }
+      });
       thumb.addEventListener('click', (e) => {
         e.stopPropagation();
         const nr = Number(thumb.dataset.nummer);
@@ -297,6 +502,10 @@ function updateLightboxView() {
   elements.lightboxTitle.textContent = `${label}  (${state.currentIndex + 1}/${total})`;
   elements.lightboxImg.src = getImgSrc(photo);
   elements.lightboxImg.alt = label;
+
+  // Apply saved rotation
+  const rot = getRotation(photo.bestand);
+  applyLightboxRotation(rot);
 
   elements.downloadBtn.href = getDownloadUrl(photo);
   elements.downloadBtn.setAttribute('download', photo.bestand);
@@ -373,6 +582,33 @@ function setupEventListeners() {
   elements.lightbox.addEventListener('click', (e) => {
     if (e.target === elements.lightbox) elements.lightbox.close();
   });
+
+  // Lightbox Rotate Action
+  if (elements.rotateBtn) {
+    elements.rotateBtn.addEventListener('click', () => {
+      if (!state.currentGroup) return;
+      const photo = state.currentGroup[state.currentIndex];
+      const newRot = rotatePhoto(photo.bestand);
+      applyLightboxRotation(newRot);
+      showToast(`🔄 Foto 90° gedraaid (${newRot}°)`, 'info', 1500);
+
+      // Update matching card images if visible in gallery
+      document.querySelectorAll(`img.main-img[src*="${encodeURIComponent(photo.bestand)}"]`).forEach((img) => {
+        img.style.transform = getCardRotationTransform(newRot, img.naturalWidth, img.naturalHeight);
+      });
+    });
+  }
+
+  // Lightbox Download Action with Rotation
+  if (elements.downloadBtn) {
+    elements.downloadBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (!state.currentGroup) return;
+      const photo = state.currentGroup[state.currentIndex];
+      const rot = getRotation(photo.bestand);
+      downloadPhoto(photo, rot);
+    });
+  }
 
   // Copy Link Action
   elements.copyLinkBtn.addEventListener('click', () => {

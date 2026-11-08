@@ -40,18 +40,22 @@
             aria-label="Zoek naar sessie of datum"
           >
         </div>
-
-        <div class="filter-pills" role="radiogroup" aria-label="Filter foto's">
-          <button class="filter-btn active" type="button" data-filter="all">Alles</button>
-          <button class="filter-btn" type="button" data-filter="strips">★ Strips</button>
-          <button class="filter-btn" type="button" data-filter="singles">Losse Foto's</button>
-        </div>
       </div>
 
       <div class="bar-stats">
         <span class="count-display" id="count">Laden...</span>
         <button class="btn yellow small" id="refresh-btn" type="button">
-          🔄 Vernieuwen
+          <svg class="pixel-icon" viewBox="0 0 10 8" width="13" height="10" shape-rendering="crispEdges" aria-hidden="true" fill="currentColor">
+            <rect x="2" y="0" width="4" height="1"/>
+            <rect x="1" y="1" width="1" height="1"/><rect x="6" y="1" width="1" height="1"/>
+            <rect x="0" y="2" width="1" height="1"/><rect x="7" y="2" width="1" height="1"/>
+            <rect x="0" y="3" width="1" height="1"/><rect x="5" y="3" width="5" height="1"/>
+            <rect x="0" y="4" width="1" height="1"/><rect x="6" y="4" width="3" height="1"/>
+            <rect x="0" y="5" width="1" height="1"/><rect x="7" y="5" width="1" height="1"/>
+            <rect x="1" y="6" width="1" height="1"/>
+            <rect x="2" y="7" width="5" height="1"/>
+          </svg>
+          <span>Vernieuwen</span>
         </button>
       </div>
     </nav>
@@ -86,6 +90,19 @@
         </div>
         
         <div class="modal-buttons-right">
+          <button class="btn cyan" id="rotate-btn" type="button" title="Draai foto 90 graden">
+            <svg class="pixel-icon" viewBox="0 0 10 8" width="13" height="10" shape-rendering="crispEdges" aria-hidden="true" fill="currentColor">
+              <rect x="2" y="0" width="4" height="1"/>
+              <rect x="1" y="1" width="1" height="1"/><rect x="6" y="1" width="1" height="1"/>
+              <rect x="0" y="2" width="1" height="1"/><rect x="7" y="2" width="1" height="1"/>
+              <rect x="0" y="3" width="1" height="1"/><rect x="5" y="3" width="5" height="1"/>
+              <rect x="0" y="4" width="1" height="1"/><rect x="6" y="4" width="3" height="1"/>
+              <rect x="0" y="5" width="1" height="1"/><rect x="7" y="5" width="1" height="1"/>
+              <rect x="1" y="6" width="1" height="1"/>
+              <rect x="2" y="7" width="5" height="1"/>
+            </svg>
+            <span>Draaien</span>
+          </button>
           <button class="btn yellow" id="copy-link-btn" type="button">🔗 Link Kopiëren</button>
           <a class="btn pink" id="download-btn" download>💾 Download</a>
           <button class="btn" id="close-btn" type="button">Sluiten</button>
