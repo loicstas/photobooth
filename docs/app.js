@@ -51,7 +51,7 @@ const PIXEL_ROTATE_SVG = `<svg class="pixel-icon" viewBox="0 0 10 8" width="13" 
 // ==========================================================================
 // ⚠️ VUL HIER JE ONLINE BACK-END URL IN WANNEER JE DIE HEBT GEHOST (bijv. op Render, Railway of ngrok):
 // Voorbeeld: const PRODUCTION_BACKEND_URL = 'https://jouw-backend-naam.onrender.com';
-const PRODUCTION_BACKEND_URL = 'https://photobooth-6cga.onrender.com';
+const PRODUCTION_BACKEND_URL = 'http://localhost:10000';
 
 const isGitHubPages = window.location.hostname.endsWith('github.io');
 const isPort3000 = location.port === '3000';
