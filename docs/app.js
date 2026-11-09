@@ -51,7 +51,7 @@ const PIXEL_ROTATE_SVG = `<svg class="pixel-icon" viewBox="0 0 10 8" width="13" 
 // ==========================================================================
 // ⚠️ VUL HIER JE ONLINE BACK-END URL IN WANNEER JE DIE HEBT GEHOST (bijv. op Render, Railway of ngrok):
 // Voorbeeld: const PRODUCTION_BACKEND_URL = 'https://jouw-backend-naam.onrender.com';
-const PRODUCTION_BACKEND_URL = '';
+const PRODUCTION_BACKEND_URL = 'https://photobooth-6cga.onrender.com';
 
 const isGitHubPages = window.location.hostname.endsWith('github.io');
 const isPort3000 = location.port === '3000';
@@ -59,8 +59,8 @@ const isPort3000 = location.port === '3000';
 const API = isPort3000
   ? ''
   : (isGitHubPages
-      ? (PRODUCTION_BACKEND_URL ? PRODUCTION_BACKEND_URL.replace(/\/$/, '') : '')
-      : (location.protocol.startsWith('http') ? `${location.protocol}//${location.hostname}:3000` : 'http://localhost:3000'));
+    ? (PRODUCTION_BACKEND_URL ? PRODUCTION_BACKEND_URL.replace(/\/$/, '') : '')
+    : (location.protocol.startsWith('http') ? `${location.protocol}//${location.hostname}:3000` : 'http://localhost:3000'));
 
 // App state
 const state = {
@@ -81,7 +81,7 @@ const elements = {
   refreshBtn: document.getElementById('refresh-btn'),
   searchInput: document.getElementById('search-input'),
   filterButtons: document.querySelectorAll('.filter-btn'),
-  
+
   // Lightbox
   lightbox: document.getElementById('lightbox'),
   lightboxTitle: document.getElementById('lightbox-title'),
@@ -297,7 +297,7 @@ async function loadPhotos(isAutoPoll = false) {
     const res = await fetch(`${API}/api/photos`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const photos = await res.json();
-    
+
     // Check if new photos arrived
     if (state.lastKnownPhotoCount !== -1 && photos.length > state.lastKnownPhotoCount) {
       showToast('✨ Nieuwe foto\'s binnengekomen in de booth!', 'success');
