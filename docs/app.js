@@ -49,10 +49,18 @@ const PIXEL_ROTATE_SVG = `<svg class="pixel-icon" viewBox="0 0 10 8" width="13" 
 // ==========================================================================
 // 2. API & Application State
 // ==========================================================================
+// ⚠️ VUL HIER JE ONLINE BACK-END URL IN WANNEER JE DIE HEBT GEHOST (bijv. op Render, Railway of ngrok):
+// Voorbeeld: const PRODUCTION_BACKEND_URL = 'https://jouw-backend-naam.onrender.com';
+const PRODUCTION_BACKEND_URL = '';
+
+const isGitHubPages = window.location.hostname.endsWith('github.io');
 const isPort3000 = location.port === '3000';
+
 const API = isPort3000
   ? ''
-  : (location.protocol.startsWith('http') ? `${location.protocol}//${location.hostname}:3000` : 'http://localhost:3000');
+  : (isGitHubPages
+      ? (PRODUCTION_BACKEND_URL ? PRODUCTION_BACKEND_URL.replace(/\/$/, '') : '')
+      : (location.protocol.startsWith('http') ? `${location.protocol}//${location.hostname}:3000` : 'http://localhost:3000'));
 
 // App state
 const state = {
@@ -91,9 +99,10 @@ const elements = {
 };
 
 // URL Helpers
-const getImgSrc = (p) => (p.url && p.url.startsWith('http') ? p.url : API + p.url);
-const getDownloadUrl = (p) => `${API}/api/download/${encodeURIComponent(p.bestand)}`;
+const getImgSrc = (p) => (p.url && (p.url.startsWith('http') || p.url.startsWith('./') || p.url.startsWith('data:')) ? p.url : (API ? API + p.url : p.url));
+const getDownloadUrl = (p) => (API ? `${API}/api/download/${encodeURIComponent(p.bestand)}` : (p.url || '#'));
 const getFullUrl = (relative) => {
+  if (relative && (relative.startsWith('http') || relative.startsWith('./'))) return relative;
   const base = isPort3000 ? window.location.origin : (API || window.location.origin);
   return `${base}${relative}`;
 };
@@ -302,12 +311,22 @@ async function loadPhotos(isAutoPoll = false) {
     console.error('Fout bij ophalen foto\'s:', err);
     if (!isAutoPoll) {
       elements.count.textContent = 'Verbindingsfout';
-      elements.grid.innerHTML = `
-        <div class="empty-box">
-          <h2>Kan geen verbinding maken</h2>
-          <p>Controleer of de backend server actief is op poort 3000 en klik op Vernieuwen.</p>
-        </div>
-      `;
+      if (isGitHubPages && !PRODUCTION_BACKEND_URL) {
+        elements.grid.innerHTML = `
+          <div class="empty-box">
+            <h2>Backend URL niet ingesteld</h2>
+            <p>Deze website draait op GitHub Pages, maar heeft nog geen online backend URL.</p>
+            <p>Host je <code>back-end</code> (bijv. op Render.com of via ngrok) en vul de URL in bij <code>PRODUCTION_BACKEND_URL</code> bovenin <code>docs/app.js</code>.</p>
+          </div>
+        `;
+      } else {
+        elements.grid.innerHTML = `
+          <div class="empty-box">
+            <h2>Kan geen verbinding maken</h2>
+            <p>Controleer of de backend server actief is en klik op Vernieuwen.</p>
+          </div>
+        `;
+      }
     }
   } finally {
     state.isLoading = false;

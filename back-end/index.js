@@ -9,9 +9,11 @@ const crypto = require("crypto");
 const cors = require("cors");
 
 const PORT = process.env.PORT || 3000;
-const frontendMap = fs.existsSync(path.join(__dirname, "..", "front-end"))
-  ? path.join(__dirname, "..", "front-end")
-  : path.join(__dirname, "..", "frontend");
+const frontendMap = fs.existsSync(path.join(__dirname, "..", "docs"))
+  ? path.join(__dirname, "..", "docs")
+  : (fs.existsSync(path.join(__dirname, "..", "front-end"))
+      ? path.join(__dirname, "..", "front-end")
+      : path.join(__dirname, "..", "frontend"));
 
 // Lokale backup map voor TouchDesigner foto's
 const backupMap = process.env.BACKUP_DIR || path.join(__dirname, "backup_photos");

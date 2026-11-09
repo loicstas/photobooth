@@ -1,0 +1,14 @@
+{
+  "name": "pixel-photobooth",
+  "version": "1.0.0",
+  "description": "Pixel Photobooth - Modern Front-End and Back-End",
+  "main": "back-end/index.js",
+  "scripts": {
+    "start": "node back-end/index.js",
+    "postinstall": "cd back-end && npm install"
+  },
+  "keywords": ["photobooth", "pixel-art"],
+  "author": "",
+  "license": "ISC"
+}
+

@@ -1,0 +1,35 @@
+[
+  {
+    "sessie": "Demo Sessie",
+    "nummer": 0,
+    "bestand": "demo-strip.png",
+    "contentType": "image/png",
+    "url": "./demo/demo-strip.png",
+    "aangemaakt": "2026-11-09T10:00:00.000Z"
+  },
+  {
+    "sessie": "Demo Sessie",
+    "nummer": 1,
+    "bestand": "demo-foto1.png",
+    "contentType": "image/png",
+    "url": "./demo/demo-foto1.png",
+    "aangemaakt": "2026-11-09T10:00:01.000Z"
+  },
+  {
+    "sessie": "Demo Sessie",
+    "nummer": 2,
+    "bestand": "demo-foto2.png",
+    "contentType": "image/png",
+    "url": "./demo/demo-foto2.png",
+    "aangemaakt": "2026-11-09T10:00:02.000Z"
+  },
+  {
+    "sessie": "Demo Sessie",
+    "nummer": 3,
+    "bestand": "demo-foto3.png",
+    "contentType": "image/png",
+    "url": "./demo/demo-foto3.png",
+    "aangemaakt": "2026-11-09T10:00:03.000Z"
+  }
+]
+
