@@ -221,6 +221,11 @@ async function syncMongoAndBackup() {
 // Database connectie events
 mongoose.connection.on("connected", () => {
   console.log("🟢 Verbonden met MongoDB");
+  mongoRetryDelay = 5000;
+  if (mongoRetryTimer) {
+    clearTimeout(mongoRetryTimer);
+    mongoRetryTimer = null;
+  }
   syncMongoAndBackup();
 });
 
@@ -232,6 +237,22 @@ mongoose.connection.on("reconnected", () => {
   console.log("🟢 MongoDB verbinding hersteld! Synchronisatie wordt hervat...");
   syncMongoAndBackup();
 });
+
+// Automatisch opnieuw proberen: bij het opstarten kan het internet (of Atlas) nog even weg zijn,
+// en dan bleef de server vroeger voorgoed in lokale backup modus hangen.
+let mongoRetryTimer = null;
+let mongoRetryDelay = 5000;
+
+function scheduleMongoRetry() {
+  if (mongoRetryTimer || !process.env.DATABASE_URI) return;
+  mongoRetryTimer = setTimeout(() => {
+    mongoRetryTimer = null;
+    if (isDbConnected() || mongoose.connection.readyState === 2) return;
+    console.log("🔁 Opnieuw verbinden met MongoDB...");
+    connectMongoDB();
+  }, mongoRetryDelay);
+  mongoRetryDelay = Math.min(mongoRetryDelay * 2, 60000);
+}
 
 function connectMongoDB() {
   if (!process.env.DATABASE_URI) {
@@ -245,7 +266,8 @@ function connectMongoDB() {
     })
     .catch((err) => {
       console.warn(`⚠️  MongoDB verbinding mislukt (${err.message}).`);
-      console.warn("👉 Geen zorgen: Server draait gewoon door in LOKALE BACKUP MODUS!");
+      console.warn("👉 Server draait gewoon door in LOKALE BACKUP MODUS en probeert het automatisch opnieuw.");
+      scheduleMongoRetry();
     });
 }
 
